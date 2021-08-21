@@ -12,7 +12,16 @@ public class Solver {
     public void printBoard() {
         for (int i = 0; i < this.board.length; i++) {
             for (int j = 0; j < this.board[i].length; j++) {
+                if (j == 3 || j == 6) {
+                    System.out.print("| "+ this.board[i][j] + " ");
+                }
+                else{
                     System.out.print(""+ this.board[i][j] + " ");
+                }
+            }
+            if (i == 2 || i == 5) {
+                System.out.println();
+                System.out.print("---------------------");
             }
             System.out.println();
         }
