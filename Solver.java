@@ -3,36 +3,36 @@ import java.util.*;
 public class Solver {
 
     private int[][] board = new int[9][9];
-    private int[][] clue = new int[9][9];
 
-    public Solver(int[][] clue) {
-        this.clue = clue;
+    public Solver() {
     }
 
     public void printBoard() {
+        String output = "\n";
         for (int i = 0; i < this.board.length; i++) {
             for (int j = 0; j < this.board[i].length; j++) {
                 if (j == 3 || j == 6) {
-                    System.out.print("| "+ this.board[i][j] + " ");
+                    if (this.board[i][j] == 0) {
+                        output += "|   ";
+                    } else {
+                        output += "| "+ this.board[i][j] + " ";
+                    }
                 }
                 else{
-                    System.out.print(""+ this.board[i][j] + " ");
+                    if (this.board[i][j] == 0) {
+                        output += "  ";
+                    } else {
+                        output += this.board[i][j] + " ";
+                    }
                 }
             }
             if (i == 2 || i == 5) {
-                System.out.println();
-                System.out.print("---------------------");
+                output += "\n---------------------";
             }
-            System.out.println();
+            output += "\n";
         }
-    }
 
-    public void fillBoard() {
-        for (int i = 0; i < this.board.length; i++) {
-            for (int j = 0; j < this.board[i].length; j++) {
-                    this.board[i][j] = this.clue[i][j];
-            }
-        }
+        System.out.print(output + "\n");
     }
 
     public boolean checkPuzzle() {
@@ -48,7 +48,7 @@ public class Solver {
         }
         for (int i = 0; i < this.board.length; i++) {
             for (int j = 0; j < this.board[i].length; j++) {
-                if (!checkSquare(i, j)) {
+                if (!checkBox(i, j) || this.board[i][j] == 0) {
                     return false;
                 }
             }
@@ -98,7 +98,7 @@ public class Solver {
         return true;
     }
 
-    public boolean checkSquare(int row, int col) {
+    public boolean checkBox(int row, int col) {
         HashMap<Integer, Integer> hmap = new HashMap<Integer, Integer>();
 
         int squareRow = row / 3 * 3;
@@ -121,8 +121,53 @@ public class Solver {
             }
         }
 
-
         return true;
+    }
+
+    public boolean checkCell(int row, int col) {
+        return this.checkRow(row) && this.checkCol(col) && this.checkBox(row, col);
+    }
+
+    public int[][] getBoard() {
+        return this.board;
+    }
+
+    public void parse(String s) {
+        if (s.length() != 81) {
+            System.out.println("Invalid grid");
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.board[i][j] = Integer.parseInt(s.substring(0,1));
+                s = s.substring(1, s.length());
+            }
+        }
+    }
+    
+    public int[][] solve(int[][] board) {
+
+        for (int row = 0; row < board.length; row++) { // Loop through rows
+            for (int col = 0; col < board[row].length; col++) { // Loop through cols
+                if (board[row][col] == 0) {
+                    for (int i = 1; i <= 9; i++) {
+                        board[row][col] = i;
+                        if (this.checkCell(row, col)) {
+                            board = this.solve(board);
+                            if (this.checkPuzzle()) {
+                                return board;
+                            }
+                        }
+                        if (i == 9) {
+                            board[row][col] = 0;
+                            return board;
+                        }
+                    }
+                }
+            }
+        }
+
+        return board;
+
     }
 
 }
